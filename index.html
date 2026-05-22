@@ -7,7 +7,6 @@
 <meta name="description" content="Aditya Trikkur — AI Engineer. Agentic LLM systems, RAG orchestration, transformer internals." />
 <meta name="theme-color" content="#0b0d0c" />
 
-<!-- Open Graph / social previews -->
 <meta property="og:title" content="Aditya Trikkur — AI Engineer" />
 <meta property="og:description" content="Agentic LLM systems · RAG orchestration · transformer internals." />
 <meta property="og:type" content="website" />
@@ -28,7 +27,9 @@
   }
   a { color: inherit; }
 
-  /* Reflow for narrow viewports */
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  .cursor-blink { animation: blink 1s step-end infinite; display: inline-block; }
+
   @media (max-width: 720px) {
     .pf-pad-lg { padding-left: 22px !important; padding-right: 22px !important; }
     .pf-hero-h1 { font-size: 40px !important; letter-spacing: -1px !important; }
@@ -158,17 +159,176 @@ const PORTFOLIO = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// COMPONENT
+// COMPONENTS
 // ─────────────────────────────────────────────────────────────
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef, useMemo } = React;
 
+// Wraps any section with a scroll-triggered fade+slide reveal
+function RevealSection({ as: Tag = 'section', className, style, delay = 0, children }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.07 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <Tag
+      ref={ref}
+      className={className}
+      style={{
+        ...style,
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'none' : 'translateY(22px)',
+        transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
+      }}
+    >
+      {children}
+    </Tag>
+  );
+}
+
+// Parses numbers out of a bullet string and counts them up when triggered
+function AnimatedBullet({ text, triggered, accentColor }) {
+  const segments = useMemo(() => {
+    const parts = [];
+    const rx = /(\d+\.?\d*)/g;
+    let last = 0, m;
+    while ((m = rx.exec(text)) !== null) {
+      if (m.index > last) parts.push({ t: 'str', v: text.slice(last, m.index) });
+      const dec = m[0].includes('.') ? m[0].split('.')[1].length : 0;
+      parts.push({ t: 'num', v: m[0], target: parseFloat(m[0]), dec });
+      last = rx.lastIndex;
+    }
+    if (last < text.length) parts.push({ t: 'str', v: text.slice(last) });
+    return parts;
+  }, [text]);
+
+  const [progress, setProgress] = useState(0);
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    if (!triggered || hasRun.current) return;
+    hasRun.current = true;
+    const dur = 1300;
+    const start = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - start) / dur, 1);
+      setProgress(1 - Math.pow(1 - p, 3));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [triggered]);
+
+  return (
+    <span>
+      {segments.map((seg, i) =>
+        seg.t === 'str'
+          ? <span key={i}>{seg.v}</span>
+          : <span key={i} style={{ color: accentColor, fontWeight: 500 }}>
+              {triggered ? (seg.target * progress).toFixed(seg.dec) : seg.v}
+            </span>
+      )}
+    </span>
+  );
+}
+
+// Expandable project card — collapsed shows title + stack, expanded reveals details + animated metrics
+function ProjectCard({ p, colors, mono }) {
+  const [expanded, setExpanded] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect(); } },
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <article
+      ref={ref}
+      onClick={() => setExpanded(x => !x)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        border: `1px solid ${expanded || hovered ? colors.accentDim : colors.line}`,
+        background: colors.surface,
+        padding: "26px 28px",
+        cursor: "pointer",
+        transition: "border-color 0.2s ease",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 8 }}>
+        <span style={{ color: colors.accent, fontSize: 13 }}>{p.n}</span>
+        <span style={{ color: colors.dim, fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>{p.kicker}</span>
+        <span style={{ marginLeft: "auto", color: colors.dim, fontSize: 11, flexShrink: 0 }}>
+          {expanded ? "[ − collapse ]" : "[ + expand ]"}
+        </span>
+      </div>
+
+      <h2 style={{ fontSize: 24, margin: "2px 0 14px", fontWeight: 600, letterSpacing: -0.4 }}>{p.title}</h2>
+
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+        {p.stack.map((s) => (
+          <span key={s} style={{ border: `1px solid ${colors.line}`, color: colors.muted, fontSize: 11, padding: "3px 8px" }}>{s}</span>
+        ))}
+      </div>
+
+      <div style={{
+        overflow: "hidden",
+        maxHeight: expanded ? "800px" : "0",
+        transition: "max-height 0.45s ease",
+      }}>
+        <p style={{ color: colors.text, fontSize: 14, maxWidth: 780, margin: "18px 0 16px" }}>{p.blurb}</p>
+        <ul style={{ listStyle: "none", padding: 0, margin: "0 0 18px", display: "flex", flexDirection: "column", gap: 6 }}>
+          {p.bullets.map((b, i) => (
+            <li key={i} style={{ fontSize: 13, color: colors.text, display: "flex", gap: 10 }}>
+              <span style={{ color: colors.accent, flexShrink: 0 }}>▸</span>
+              <AnimatedBullet text={b} triggered={inView && expanded} accentColor={colors.accent} />
+            </li>
+          ))}
+        </ul>
+        {p.links.length > 0 && (
+          <div style={{ display: "flex", gap: 18, fontSize: 12, flexWrap: "wrap" }}>
+            {p.links.map((l) => (
+              <a
+                key={l.label}
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                style={{ color: colors.accent, textDecoration: "none", borderBottom: `1px solid ${colors.accentDim}` }}
+              >
+                → {l.label}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// MAIN PORTFOLIO COMPONENT
+// ─────────────────────────────────────────────────────────────
 function Portfolio() {
   const P = PORTFOLIO;
+
   const [dark, setDark] = useState(() => {
-    try {
-      const saved = localStorage.getItem("pf-theme");
-      if (saved) return saved === "dark";
-    } catch (e) {}
+    try { const s = localStorage.getItem("pf-theme"); if (s) return s === "dark"; } catch (e) {}
     return true;
   });
 
@@ -178,6 +338,39 @@ function Portfolio() {
     document.body.style.color = dark ? "#dfe5e1" : "#1a1d1b";
   }, [dark]);
 
+  // Typing animation: command → name → fade in rest
+  const [typedCmd, setTypedCmd] = useState("");
+  const [typedName, setTypedName] = useState("");
+  const [phase, setPhase] = useState("cmd"); // "cmd" | "name" | "done"
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    const cmd = "whoami";
+    const name = P.name;
+
+    const typeCmd = (i) => {
+      setTypedCmd(cmd.slice(0, i));
+      if (i < cmd.length) {
+        timerRef.current = setTimeout(() => typeCmd(i + 1), 55);
+      } else {
+        setPhase("name");
+        timerRef.current = setTimeout(() => typeName(0), 280);
+      }
+    };
+
+    const typeName = (i) => {
+      setTypedName(name.slice(0, i));
+      if (i < name.length) {
+        timerRef.current = setTimeout(() => typeName(i + 1), 65);
+      } else {
+        setPhase("done");
+      }
+    };
+
+    timerRef.current = setTimeout(() => typeCmd(0), 300);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, []);
+
   const colors = dark
     ? { bg: "#0b0d0c", surface: "#111413", line: "#1f2421", text: "#dfe5e1", muted: "#7a857f", dim: "#535c57", accent: "#9fe07a", accentDim: "#5e8a48", warn: "#e6c887" }
     : { bg: "#f4f1ea", surface: "#eae6dc", line: "#cdc7b8", text: "#1a1d1b", muted: "#5b625d", dim: "#8a8f88", accent: "#2f6b1e", accentDim: "#5e8a48", warn: "#8a6b1e" };
@@ -186,6 +379,7 @@ function Portfolio() {
 
   return (
     <div style={{ fontFamily: mono, background: colors.bg, color: colors.text, minHeight: "100vh", fontSize: 14, lineHeight: 1.6 }}>
+
       {/* Top bar */}
       <div className="pf-pad-lg" style={{
         position: "sticky", top: 0, zIndex: 10, background: colors.surface,
@@ -211,19 +405,22 @@ function Portfolio() {
 
       {/* Hero */}
       <section className="pf-pad-lg" style={{ padding: "56px 56px 32px" }}>
-        <div style={{ color: colors.muted, marginBottom: 14, fontSize: 12 }}>
-          <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>whoami</span>
+        <div style={{ color: colors.muted, marginBottom: 14, fontSize: 12, minHeight: "1.6em" }}>
+          <span style={{ color: colors.accent }}>~</span>{" "}
+          <span style={{ color: colors.warn }}>{typedCmd}</span>
+          {phase === "cmd" && <span className="cursor-blink" style={{ color: colors.accent }}>▌</span>}
         </div>
-        <h1 className="pf-hero-h1" style={{ fontFamily: mono, fontSize: 64, fontWeight: 600, lineHeight: 1.05, margin: 0, letterSpacing: -1.5 }}>
-          {P.name}<span style={{ color: colors.accent, marginLeft: 2 }}>_</span>
+        <h1 className="pf-hero-h1" style={{ fontFamily: mono, fontSize: 64, fontWeight: 600, lineHeight: 1.05, margin: 0, letterSpacing: -1.5, minHeight: "1.15em" }}>
+          {typedName}
+          <span className={phase === "done" ? "cursor-blink" : ""} style={{ color: colors.accent, marginLeft: 2 }}>_</span>
         </h1>
-        <div style={{ marginTop: 18, color: colors.muted, fontSize: 14 }}>
+        <div style={{ marginTop: 18, color: colors.muted, fontSize: 14, opacity: phase === "done" ? 1 : 0, transition: "opacity 0.5s ease" }}>
           <span style={{ color: colors.accent }}>{">"}</span> {P.role} · 6 yrs · LLM internals → agentic orchestration
         </div>
-        <p style={{ maxWidth: 720, marginTop: 28, fontSize: 18, lineHeight: 1.55, color: colors.text, fontFamily: mono }}>
+        <p style={{ maxWidth: 720, marginTop: 28, fontSize: 18, lineHeight: 1.55, color: colors.text, fontFamily: mono, opacity: phase === "done" ? 1 : 0, transition: "opacity 0.5s ease 0.2s" }}>
           {P.tagline}
         </p>
-        <div style={{ marginTop: 28, display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ marginTop: 28, display: "flex", gap: 10, flexWrap: "wrap", opacity: phase === "done" ? 1 : 0, transition: "opacity 0.5s ease 0.4s" }}>
           {[
             { k: "email", v: P.email, href: `mailto:${P.email}` },
             { k: "github", v: "@trikkurtreat", href: `https://${P.github}` },
@@ -243,7 +440,7 @@ function Portfolio() {
       </section>
 
       {/* Skills */}
-      <section className="pf-pad-lg" style={{ padding: "14px 56px 40px" }}>
+      <RevealSection className="pf-pad-lg" style={{ padding: "14px 56px 40px" }}>
         <div style={{ border: `1px solid ${colors.line}`, background: colors.surface, padding: "16px 22px", fontSize: 12 }}>
           <div style={{ color: colors.muted, marginBottom: 10 }}>
             <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>cat</span> skills.toml
@@ -255,10 +452,10 @@ function Portfolio() {
             </div>
           ))}
         </div>
-      </section>
+      </RevealSection>
 
       {/* Writing */}
-      <section className="pf-pad-lg" style={{ padding: "20px 56px 40px" }}>
+      <RevealSection className="pf-pad-lg" style={{ padding: "20px 56px 40px" }}>
         <div style={{ color: colors.muted, marginBottom: 18, fontSize: 12 }}>
           <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>tail</span> -n 4 ~/blog/posts
           <span style={{ color: colors.dim, marginLeft: 14 }}># {P.blog}</span>
@@ -278,10 +475,10 @@ function Portfolio() {
             </a>
           ))}
         </div>
-      </section>
+      </RevealSection>
 
       {/* Experience */}
-      <section className="pf-pad-lg" style={{ padding: "20px 56px 40px" }}>
+      <RevealSection className="pf-pad-lg" style={{ padding: "20px 56px 40px" }}>
         <div style={{ color: colors.muted, marginBottom: 22, fontSize: 12 }}>
           <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>git</span> log --career --since=2020
         </div>
@@ -307,48 +504,19 @@ function Portfolio() {
             </div>
           ))}
         </div>
-      </section>
+      </RevealSection>
 
       {/* Projects */}
-      <section className="pf-pad-lg" style={{ padding: "20px 56px 56px" }}>
+      <RevealSection className="pf-pad-lg" style={{ padding: "20px 56px 56px" }}>
         <div style={{ color: colors.muted, marginBottom: 22, fontSize: 12 }}>
           <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>ls</span> projects/
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           {P.projects.map((p) => (
-            <article key={p.n} style={{ border: `1px solid ${colors.line}`, background: colors.surface, padding: "26px 28px" }}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 8 }}>
-                <span style={{ color: colors.accent, fontSize: 13 }}>{p.n}</span>
-                <span style={{ color: colors.dim, fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>{p.kicker}</span>
-              </div>
-              <h2 style={{ fontSize: 24, margin: "2px 0 14px", fontWeight: 600, letterSpacing: -0.4 }}>{p.title}</h2>
-              <p style={{ color: colors.text, fontSize: 14, maxWidth: 780, margin: "0 0 16px" }}>{p.blurb}</p>
-              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 18px", display: "flex", flexDirection: "column", gap: 6 }}>
-                {p.bullets.map((b, i) => (
-                  <li key={i} style={{ fontSize: 13, color: colors.text, display: "flex", gap: 10 }}>
-                    <span style={{ color: colors.accent }}>▸</span>
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: p.links.length > 0 ? 14 : 0 }}>
-                {p.stack.map((s) => (
-                  <span key={s} style={{ border: `1px solid ${colors.line}`, color: colors.muted, fontSize: 11, padding: "3px 8px" }}>{s}</span>
-                ))}
-              </div>
-              {p.links.length > 0 && (
-                <div style={{ display: "flex", gap: 18, fontSize: 12, flexWrap: "wrap", marginTop: 14 }}>
-                  {p.links.map((l) => (
-                    <a key={l.label} href={l.href} style={{ color: colors.accent, textDecoration: "none", borderBottom: `1px solid ${colors.accentDim}` }}>
-                      → {l.label}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </article>
+            <ProjectCard key={p.n} p={p} colors={colors} mono={mono} />
           ))}
         </div>
-      </section>
+      </RevealSection>
 
       {/* Footer */}
       <footer className="pf-pad-lg" style={{
