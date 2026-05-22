@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Aditya Trikkur — AI Engineer</title>
+<meta name="description" content="Aditya Trikkur — AI Engineer. Agentic LLM systems, RAG orchestration, transformer internals." />
+<meta name="theme-color" content="#0b0d0c" />
+
+<!-- Open Graph / social previews -->
+<meta property="og:title" content="Aditya Trikkur — AI Engineer" />
+<meta property="og:description" content="Agentic LLM systems · RAG orchestration · transformer internals." />
+<meta property="og:type" content="website" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #0b0d0c;
+    color: #dfe5e1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: inherit; }
+
+  /* Reflow for narrow viewports */
+  @media (max-width: 720px) {
+    .pf-pad-lg { padding-left: 22px !important; padding-right: 22px !important; }
+    .pf-hero-h1 { font-size: 40px !important; letter-spacing: -1px !important; }
+    .pf-2col { grid-template-columns: 1fr !important; gap: 12px !important; }
+    .pf-write-row { grid-template-columns: 30px 1fr !important; }
+    .pf-write-row .pf-w-date, .pf-write-row .pf-w-tag { display: none !important; }
+    .pf-topbar-right { gap: 10px !important; }
+    .pf-topbar-hide-sm { display: none !important; }
+  }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+// ─────────────────────────────────────────────────────────────
+// EDIT YOUR CONTENT HERE
+// ─────────────────────────────────────────────────────────────
+const PORTFOLIO = {
+  name: "Aditya Trikkur",
+  role: "AI Engineer",
+  location: "Toronto, ON",
+  email: "adyanrfuture@gmail.com",
+  github: "github.com/trikkurtreat",
+  linkedin: "linkedin.com/in/aditya9898",
+  blog: "trikkurtreat.hashnode.dev",
+  blogLabel: "trikkurtreat",
+  tagline: "I build agentic LLM systems — from kernel-level optimization to production-grade RAG orchestration.",
+
+  projects: [
+    {
+      n: "01",
+      title: "Financial Document Intelligence Agent",
+      kicker: "Agentic RAG · Production",
+      stack: ["LangGraph", "Azure AI Search", "GPT-4o", "Azure Doc Intelligence"],
+      blurb: "A 5-node LangGraph StateGraph that reasons over 190-page financial reports. Hybrid retrieval (BM25 + HNSW + Semantic Reranker) over layout-aware Markdown chunks, with interrupt-based clarification loops for query refinement.",
+      bullets: [
+        "5 specialized nodes: intent filter → hybrid retriever → routing assessor → citation-grounded generator → HITL clarifier",
+        "+22% Context Precision (0.87 RAGAS), +18% Context Recall (0.82)",
+        "0.91 Answer Faithfulness · 0.88 Answer Relevance on IFRS 9 / risk governance Q&A",
+      ],
+      links: [],
+    },
+    {
+      n: "02",
+      title: "GetBud — Agentic Finance Tracker",
+      kicker: "HITL Agents · NL2SQL",
+      stack: ["LangGraph", "PostgreSQL", "Pydantic", "Streamlit"],
+      blurb: "Production-ready agentic workflow for daily expense tracking. HITL checkpoints gate database writes; a PostgreSQL-backed checkpointer gives the agent long-term memory and resumable threads across multi-day dialogues.",
+      bullets: [
+        "Natural-language → SQL interface with structured Pydantic schemas for batch logging",
+        "State reducers track token usage and LLM-call counts to prevent runaway loops",
+        "Persistent state survives interruption; agent picks back up mid-conversation",
+      ],
+      links: [
+        { label: "Source", href: "https://github.com/trikkurtreat/getbud" },
+      ],
+    },
+    {
+      n: "03",
+      title: "LLM-Land — Transformers from Scratch",
+      kicker: "PyTorch · Research",
+      stack: ["PyTorch", "GPT-2", "Llama 2", "RoPE", "RMSNorm"],
+      blurb: "A modular library for testing attention mechanisms and normalization layers. GPT-2 and Llama 2 implemented from the architecture papers up — rotary embeddings, bfloat16, vectorized RMSNorm.",
+      bullets: [
+        "Rotary Positional Embeddings (RoPE) implemented from the paper",
+        "~50% GPU memory overhead reduction via bfloat16 + vectorized RMSNorm",
+        "Drop-in module library for swapping attention / norm layers in experiments",
+      ],
+      links: [
+        { label: "GitHub", href: "https://github.com/trikkurtreat/llm-land" },
+      ],
+    },
+  ],
+
+  writing: [
+    { title: "Getting Back in the Water is Cold", date: "2025", tag: "Blog", href: "https://trikkurtreat.hashnode.dev/getting-back-in-the-water-is-cold" },
+    { title: "Implementing RoPE in 80 Lines of PyTorch", date: "2025", tag: "Architecture", href: "https://trikkurtreat.hashnode.dev/rope-explained" },
+    { title: "Why HITL Checkpoints Belong in Production Agents", date: "2025", tag: "Agents", href: "https://trikkurtreat.hashnode.dev" },
+    { title: "Semantic Reranking Actually Moved the Needle", date: "2024", tag: "RAG", href: "https://trikkurtreat.hashnode.dev" },
+  ],
+
+  experience: [
+    {
+      role: "Data Developer",
+      org: "Convergint",
+      where: "Toronto",
+      period: "Jul 2022 – Present",
+      points: [
+        "End-to-end RAG QA Bot on Teams over SharePoint; Azure AI Search hybrid retrieval + semantic rerank",
+        "Migrated legacy warehouse to Snowflake via SQLMesh — high-perf intermediate tables, scoring logic",
+        "ADF orchestration between Snowflake, D365 CE, Spectrum, NetSuite — 99% data parity",
+        "Re-engineered stored procs for incremental loading — 40-min nightly load reduction, +80% throughput",
+      ],
+    },
+    {
+      role: "Machine Learning Engineer",
+      org: "Multicoreware Inc.",
+      where: "Chennai",
+      period: "Jul 2021 – May 2022",
+      points: [
+        "C++/CUDA kernels (Convolution, Depthwise Separable) for custom NN processors",
+        "Loop tiling + SIMD vectorization — +30% throughput via register reuse and cache hygiene",
+        "TVM compiler stack for automated kernel tuning on custom AI accelerators",
+      ],
+    },
+    {
+      role: "Machine Learning Engineer",
+      org: "Smartail Pvt. Ltd.",
+      where: "Chennai",
+      period: "Jun 2020 – Jul 2021",
+      points: [
+        "ViT-based Handwritten Text Recognition replacing legacy OCR; autoencoders for image denoising",
+        "BERT-based grading evaluates intent and meaning, not keywords; FAISS sub-ms vector search",
+        "Deployed transformers on SageMaker via Docker + FastAPI — 100K+ evaluations daily",
+      ],
+    },
+  ],
+
+  skills: {
+    "AI / LLMs": ["LangGraph", "LangChain", "PyTorch", "Transformers", "RAG", "Hybrid Search", "Semantic Reranking", "RoPE", "RMSNorm", "LoRA / QLoRA", "FAISS", "Azure OpenAI", "Azure AI Search"],
+    "Systems / Infra": ["CUDA", "C++", "SIMD", "Loop Tiling", "TVM", "Docker", "FastAPI", "PostgreSQL"],
+    "Data": ["Snowflake", "SQLMesh", "dbt", "Azure Data Factory", "SageMaker", "Pydantic", "Streamlit"],
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
+// COMPONENT
+// ─────────────────────────────────────────────────────────────
+const { useState, useEffect } = React;
+
+function Portfolio() {
+  const P = PORTFOLIO;
+  const [dark, setDark] = useState(() => {
+    try {
+      const saved = localStorage.getItem("pf-theme");
+      if (saved) return saved === "dark";
+    } catch (e) {}
+    return true;
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem("pf-theme", dark ? "dark" : "light"); } catch (e) {}
+    document.body.style.background = dark ? "#0b0d0c" : "#f4f1ea";
+    document.body.style.color = dark ? "#dfe5e1" : "#1a1d1b";
+  }, [dark]);
+
+  const colors = dark
+    ? { bg: "#0b0d0c", surface: "#111413", line: "#1f2421", text: "#dfe5e1", muted: "#7a857f", dim: "#535c57", accent: "#9fe07a", accentDim: "#5e8a48", warn: "#e6c887" }
+    : { bg: "#f4f1ea", surface: "#eae6dc", line: "#cdc7b8", text: "#1a1d1b", muted: "#5b625d", dim: "#8a8f88", accent: "#2f6b1e", accentDim: "#5e8a48", warn: "#8a6b1e" };
+
+  const mono = "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
+
+  return (
+    <div style={{ fontFamily: mono, background: colors.bg, color: colors.text, minHeight: "100vh", fontSize: 14, lineHeight: 1.6 }}>
+      {/* Top bar */}
+      <div className="pf-pad-lg" style={{
+        position: "sticky", top: 0, zIndex: 10, background: colors.surface,
+        borderBottom: `1px solid ${colors.line}`, padding: "10px 28px",
+        display: "flex", alignItems: "center", gap: 14, fontSize: 12,
+      }}>
+        <div style={{ display: "flex", gap: 6 }}>
+          <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#ff5f56", display: "inline-block" }}></span>
+          <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#ffbd2e", display: "inline-block" }}></span>
+          <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#27c93f", display: "inline-block" }}></span>
+        </div>
+        <div className="pf-topbar-hide-sm" style={{ color: colors.muted, marginLeft: 8 }}>aditya@portfolio ~ % zsh · 142×48</div>
+        <div className="pf-topbar-right" style={{ marginLeft: "auto", display: "flex", gap: 18, alignItems: "center" }}>
+          <span className="pf-topbar-hide-sm" style={{ color: colors.dim }}>{P.location}</span>
+          <span className="pf-topbar-hide-sm" style={{ color: colors.dim }}>·</span>
+          <span style={{ color: colors.accent }}>✦ available for work</span>
+          <button onClick={() => setDark(!dark)} style={{
+            background: "transparent", border: `1px solid ${colors.line}`, color: colors.muted,
+            padding: "3px 10px", fontFamily: mono, fontSize: 11, cursor: "pointer", borderRadius: 3,
+          }}>{dark ? "[ light ]" : "[ dark ]"}</button>
+        </div>
+      </div>
+
+      {/* Hero */}
+      <section className="pf-pad-lg" style={{ padding: "56px 56px 32px" }}>
+        <div style={{ color: colors.muted, marginBottom: 14, fontSize: 12 }}>
+          <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>whoami</span>
+        </div>
+        <h1 className="pf-hero-h1" style={{ fontFamily: mono, fontSize: 64, fontWeight: 600, lineHeight: 1.05, margin: 0, letterSpacing: -1.5 }}>
+          {P.name}<span style={{ color: colors.accent, marginLeft: 2 }}>_</span>
+        </h1>
+        <div style={{ marginTop: 18, color: colors.muted, fontSize: 14 }}>
+          <span style={{ color: colors.accent }}>{">"}</span> {P.role} · 6 yrs · LLM internals → agentic orchestration
+        </div>
+        <p style={{ maxWidth: 720, marginTop: 28, fontSize: 18, lineHeight: 1.55, color: colors.text, fontFamily: mono }}>
+          {P.tagline}
+        </p>
+        <div style={{ marginTop: 28, display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {[
+            { k: "email", v: P.email, href: `mailto:${P.email}` },
+            { k: "github", v: "@trikkurtreat", href: `https://${P.github}` },
+            { k: "linkedin", v: "@aditya9898", href: `https://${P.linkedin}` },
+            { k: "blog", v: P.blogLabel, href: `https://${P.blog}` },
+          ].map((l) => (
+            <a key={l.k} href={l.href} style={{
+              border: `1px solid ${colors.line}`, color: colors.text, padding: "9px 14px",
+              fontSize: 12, textDecoration: "none", fontFamily: mono,
+              display: "inline-flex", gap: 10, alignItems: "center",
+            }}>
+              <span style={{ color: colors.dim }}>--{l.k}</span>
+              <span>{l.v}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Skills */}
+      <section className="pf-pad-lg" style={{ padding: "14px 56px 40px" }}>
+        <div style={{ border: `1px solid ${colors.line}`, background: colors.surface, padding: "16px 22px", fontSize: 12 }}>
+          <div style={{ color: colors.muted, marginBottom: 10 }}>
+            <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>cat</span> skills.toml
+          </div>
+          {Object.entries(P.skills).map(([k, v]) => (
+            <div key={k} className="pf-2col" style={{ display: "flex", gap: 14, padding: "5px 0", borderTop: `1px dashed ${colors.line}` }}>
+              <div style={{ color: colors.accentDim, minWidth: 140 }}>[{k}]</div>
+              <div style={{ color: colors.text, flex: 1 }}>{v.join(" · ")}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Projects */}
+      <section className="pf-pad-lg" style={{ padding: "20px 56px 40px" }}>
+        <div style={{ color: colors.muted, marginBottom: 22, fontSize: 12 }}>
+          <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>ls</span> projects/
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          {P.projects.map((p) => (
+            <article key={p.n} style={{ border: `1px solid ${colors.line}`, background: colors.surface, padding: "26px 28px" }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 8 }}>
+                <span style={{ color: colors.accent, fontSize: 13 }}>{p.n}</span>
+                <span style={{ color: colors.dim, fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>{p.kicker}</span>
+              </div>
+              <h2 style={{ fontSize: 24, margin: "2px 0 14px", fontWeight: 600, letterSpacing: -0.4 }}>{p.title}</h2>
+              <p style={{ color: colors.text, fontSize: 14, maxWidth: 780, margin: "0 0 16px" }}>{p.blurb}</p>
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 18px", display: "flex", flexDirection: "column", gap: 6 }}>
+                {p.bullets.map((b, i) => (
+                  <li key={i} style={{ fontSize: 13, color: colors.text, display: "flex", gap: 10 }}>
+                    <span style={{ color: colors.accent }}>▸</span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: p.links.length > 0 ? 14 : 0 }}>
+                {p.stack.map((s) => (
+                  <span key={s} style={{ border: `1px solid ${colors.line}`, color: colors.muted, fontSize: 11, padding: "3px 8px" }}>{s}</span>
+                ))}
+              </div>
+              {p.links.length > 0 && (
+                <div style={{ display: "flex", gap: 18, fontSize: 12, flexWrap: "wrap", marginTop: 14 }}>
+                  {p.links.map((l) => (
+                    <a key={l.label} href={l.href} style={{ color: colors.accent, textDecoration: "none", borderBottom: `1px solid ${colors.accentDim}` }}>
+                      → {l.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Writing */}
+      <section className="pf-pad-lg" style={{ padding: "20px 56px 40px" }}>
+        <div style={{ color: colors.muted, marginBottom: 18, fontSize: 12 }}>
+          <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>tail</span> -n 4 ~/blog/posts
+          <span style={{ color: colors.dim, marginLeft: 14 }}># {P.blog}</span>
+        </div>
+        <div style={{ border: `1px solid ${colors.line}` }}>
+          {P.writing.map((w, i) => (
+            <a key={i} href={w.href} target="_blank" rel="noopener noreferrer" className="pf-write-row" style={{
+              display: "grid", gridTemplateColumns: "60px 110px 1fr 90px", padding: "14px 22px",
+              textDecoration: "none", color: colors.text,
+              borderTop: i === 0 ? "none" : `1px dashed ${colors.line}`,
+              fontSize: 13, alignItems: "center",
+            }}>
+              <span style={{ color: colors.dim }}>{String(i + 1).padStart(2, "0")}</span>
+              <span className="pf-w-date" style={{ color: colors.muted, fontSize: 11 }}>{w.date}</span>
+              <span style={{ color: colors.text }}>{w.title}</span>
+              <span className="pf-w-tag" style={{ color: colors.accent, fontSize: 11, textAlign: "right" }}>#{w.tag.toLowerCase()}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Experience */}
+      <section className="pf-pad-lg" style={{ padding: "20px 56px 56px" }}>
+        <div style={{ color: colors.muted, marginBottom: 22, fontSize: 12 }}>
+          <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>git</span> log --career --since=2020
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+          {P.experience.map((e, i) => (
+            <div key={i} className="pf-2col" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 32 }}>
+              <div>
+                <div style={{ fontSize: 11, color: colors.accent, marginBottom: 6 }}>{e.period}</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{e.org}</div>
+                <div style={{ fontSize: 12, color: colors.muted }}>{e.where}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 10 }}>{e.role}</div>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+                  {e.points.map((pt, j) => (
+                    <li key={j} style={{ fontSize: 13, color: colors.text, display: "flex", gap: 10 }}>
+                      <span style={{ color: colors.dim }}>+</span>
+                      <span>{pt}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="pf-pad-lg" style={{
+        borderTop: `1px solid ${colors.line}`, padding: "28px 56px", background: colors.surface,
+        fontSize: 12, color: colors.muted, display: "flex", justifyContent: "space-between",
+        alignItems: "center", gap: 12, flexWrap: "wrap",
+      }}>
+        <span>
+          <span style={{ color: colors.accent }}>~</span>{" "}
+          <span style={{ color: colors.warn }}>echo</span>{" "}
+          <span style={{ color: colors.text }}>"thanks for stopping by"</span>
+        </span>
+        <span>© 2026 · built by hand</span>
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<Portfolio />);
+</script>
+</body>
+</html>
