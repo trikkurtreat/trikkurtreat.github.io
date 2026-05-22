@@ -257,8 +257,60 @@ function Portfolio() {
         </div>
       </section>
 
-      {/* Projects */}
+      {/* Writing */}
       <section className="pf-pad-lg" style={{ padding: "20px 56px 40px" }}>
+        <div style={{ color: colors.muted, marginBottom: 18, fontSize: 12 }}>
+          <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>tail</span> -n 4 ~/blog/posts
+          <span style={{ color: colors.dim, marginLeft: 14 }}># {P.blog}</span>
+        </div>
+        <div style={{ border: `1px solid ${colors.line}` }}>
+          {P.writing.map((w, i) => (
+            <a key={i} href={w.href} target="_blank" rel="noopener noreferrer" className="pf-write-row" style={{
+              display: "grid", gridTemplateColumns: "60px 110px 1fr 90px", padding: "14px 22px",
+              textDecoration: "none", color: colors.text,
+              borderTop: i === 0 ? "none" : `1px dashed ${colors.line}`,
+              fontSize: 13, alignItems: "center",
+            }}>
+              <span style={{ color: colors.dim }}>{String(i + 1).padStart(2, "0")}</span>
+              <span className="pf-w-date" style={{ color: colors.muted, fontSize: 11 }}>{w.date}</span>
+              <span style={{ color: colors.text }}>{w.title}</span>
+              <span className="pf-w-tag" style={{ color: colors.accent, fontSize: 11, textAlign: "right" }}>#{w.tag.toLowerCase()}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Experience */}
+      <section className="pf-pad-lg" style={{ padding: "20px 56px 40px" }}>
+        <div style={{ color: colors.muted, marginBottom: 22, fontSize: 12 }}>
+          <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>git</span> log --career --since=2020
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+          {P.experience.map((e, i) => (
+            <div key={i} className="pf-2col" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 32 }}>
+              <div>
+                <div style={{ fontSize: 11, color: colors.accent, marginBottom: 6 }}>{e.period}</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{e.org}</div>
+                <div style={{ fontSize: 12, color: colors.muted }}>{e.where}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 10 }}>{e.role}</div>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+                  {e.points.map((pt, j) => (
+                    <li key={j} style={{ fontSize: 13, color: colors.text, display: "flex", gap: 10 }}>
+                      <span style={{ color: colors.dim }}>+</span>
+                      <span>{pt}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Projects */}
+      <section className="pf-pad-lg" style={{ padding: "20px 56px 56px" }}>
         <div style={{ color: colors.muted, marginBottom: 22, fontSize: 12 }}>
           <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>ls</span> projects/
         </div>
@@ -294,58 +346,6 @@ function Portfolio() {
                 </div>
               )}
             </article>
-          ))}
-        </div>
-      </section>
-
-      {/* Writing */}
-      <section className="pf-pad-lg" style={{ padding: "20px 56px 40px" }}>
-        <div style={{ color: colors.muted, marginBottom: 18, fontSize: 12 }}>
-          <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>tail</span> -n 4 ~/blog/posts
-          <span style={{ color: colors.dim, marginLeft: 14 }}># {P.blog}</span>
-        </div>
-        <div style={{ border: `1px solid ${colors.line}` }}>
-          {P.writing.map((w, i) => (
-            <a key={i} href={w.href} target="_blank" rel="noopener noreferrer" className="pf-write-row" style={{
-              display: "grid", gridTemplateColumns: "60px 110px 1fr 90px", padding: "14px 22px",
-              textDecoration: "none", color: colors.text,
-              borderTop: i === 0 ? "none" : `1px dashed ${colors.line}`,
-              fontSize: 13, alignItems: "center",
-            }}>
-              <span style={{ color: colors.dim }}>{String(i + 1).padStart(2, "0")}</span>
-              <span className="pf-w-date" style={{ color: colors.muted, fontSize: 11 }}>{w.date}</span>
-              <span style={{ color: colors.text }}>{w.title}</span>
-              <span className="pf-w-tag" style={{ color: colors.accent, fontSize: 11, textAlign: "right" }}>#{w.tag.toLowerCase()}</span>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* Experience */}
-      <section className="pf-pad-lg" style={{ padding: "20px 56px 56px" }}>
-        <div style={{ color: colors.muted, marginBottom: 22, fontSize: 12 }}>
-          <span style={{ color: colors.accent }}>~</span> <span style={{ color: colors.warn }}>git</span> log --career --since=2020
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          {P.experience.map((e, i) => (
-            <div key={i} className="pf-2col" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 32 }}>
-              <div>
-                <div style={{ fontSize: 11, color: colors.accent, marginBottom: 6 }}>{e.period}</div>
-                <div style={{ fontSize: 14, fontWeight: 600 }}>{e.org}</div>
-                <div style={{ fontSize: 12, color: colors.muted }}>{e.where}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 10 }}>{e.role}</div>
-                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 4 }}>
-                  {e.points.map((pt, j) => (
-                    <li key={j} style={{ fontSize: 13, color: colors.text, display: "flex", gap: 10 }}>
-                      <span style={{ color: colors.dim }}>+</span>
-                      <span>{pt}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
           ))}
         </div>
       </section>
